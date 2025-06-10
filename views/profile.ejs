@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/output.css" />
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
+  <title>Settings</title>
+  <style>
+    /* Hide scrollbars globally across all elements */
+    * {
+        scrollbar-width: none;            /* Firefox */
+        -ms-overflow-style: none;         /* IE 10+ */
+    }
+
+    *::-webkit-scrollbar {
+        display: "none";                    /* Chrome, Safari, Opera */
+    }
+
+    .apexcharts-tooltip {
+        color: #000000 !important;
+        font-family: 'Montserrat', sans-serif !important;
+    }
+
+    .apexcharts-legend {
+      padding-bottom: 50px;
+    }
+
+
+  </style>
+</head>
+<body class="bg-gray-900 h-screen w-screen flex flex-row text-white">
+    <%- include('components/forms') %>
+
+    <div class="bg-white w-[100px] h-full">
+        <%- include('components/nav') %>
+    </div>
+    <div class="bg-white w-full h-full flex flex-col relative">
+        <%- include('components/header', { data: header }) %>
+        <%- include('components/toasts') %>
+        <%- include('components/modal') %>
+
+
+        <div class="rounded-tl-4xl bg-gray-100 flex flex-row gap-5 w-full h-full p-5">
+            <div class="w-[40%] flex flex-col gap-2 p-5">
+                <div class="flex flex-row gap-2">
+                    <img
+                    class="w-30 h-30 rounded-full"
+                    src="/photoclass/<%= account.photo_url ? account.photo_url : '/photos/bird.png' %>"
+                    alt="Rounded avatar"
+                    />
+                    <div class="flex flex-col items-start gap-0 pl-2 w-fit justify-center">
+                        <p class="text-base font-semibold text-black"><%= account.first_name || "" %> <%= account.middle_name || "" %> <%= account.last_name || "" %></p>
+                        <p class="text-xs font-normal text-gray-500">Joined : <%= account.date_added || "" %></p>
+
+                        <p class="text-sm font-semibold text-black mt-3"><%= account.email || "" %></p>
+                        <p class="text-xs font-normal text-gray-500">Last sign in <%= account.last_signin || "" %></p>
+                    </div>
+                    
+                </div>
+                
+            </div>
+            <div class="w-[60%] flex flex-col gap-2">
+                <div class="bg-white h-fit flex flex-col gap-2 border-2 border-gray-300 rounded-2xl p-4 w-full">
+                    <p class="text-base font-semibold text-black">Personal Information</p> 
+                    
+                    <form id="personalinfoform" class="flex flex-col gap-2 rounded-2xl w-full h-fit">
+                        <div class="flex flex-row gap-4 w-full h-fit mt-3">
+                            <div class="flex flex-col w-full">
+                                <label for="firstname" class="block mb-2 text-sm font-medium text-gray-900">First Name:</label>
+                                <input value="<%= account.first_name || "" %>" name="firstname" type="text" aria-describedby="helper-text-explanation" class="w-full mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 " placeholder="First" required/>
+                            </div>
+                            <div class="flex flex-col w-full">
+                                <label for="middlename" class="block mb-2 text-sm font-medium text-gray-900">Middle Name:</label>
+                                <input value="<%= account.middle_name || "" %>" name="middlename" type="text" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 " placeholder="Middle"/>
+                            </div>
+                            <div class="flex flex-col w-full">
+                                <label for="lastname" class="block mb-2 text-sm font-medium text-gray-900">Last Name:</label>
+                                <input value="<%= account.last_name || "" %>" name="lastname" type="text" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 " placeholder="Last"/>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-row gap-4 w-full h-fit">
+                            <div class="flex flex-col w-full">
+                                <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email:</label>
+                                <input value="<%= account.email || "" %>" name="email" type="email" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 " placeholder="email@gmail.com" required/>
+                            </div>
+                            <div class="flex flex-col w-full">
+                                <label for="phone" class="block mb-2 text-sm font-medium text-gray-900">Phone Number:</label>
+                                <input value="<%= account.phone || "" %>" name="phone" type="tel" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 " placeholder="09123456789"/>
+                            </div>
+                        </div>
+                        <div class="flex flex-row items-center justify-end mt-5">
+                            <button type="submit" class="inline-flex felx-row gap-2 items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-4 h-4 text-white" fill="currentColor">
+                                <path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm0 96c0-17.7 14.3-32 32-32l192 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L96 224c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+                            Save</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-white h-fit flex flex-col gap-2 border-2 border-gray-300 rounded-2xl p-4 w-full">
+                    <p class="text-base font-semibold text-black">Change Password</p> 
+                    
+                    <form id="changePassForm" class="flex flex-col gap-2 rounded-2xl w-full h-fit">
+                        <div class="flex flex-row gap-4 w-full h-fit">
+                            <div class="flex flex-col w-full">
+                                <label for="newpass" class="block mb-2 text-sm font-medium text-gray-900">New Password:</label>
+                                <input name="newpass" type="password" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 " placeholder="*******"/>
+                            </div>
+                            <div class="flex flex-col w-full">
+                                <label for="confirmnewpass" class="block mb-2 text-sm font-medium text-gray-900">Confirm New Password:</label>
+                                <input name="confirmnewpass" type="password" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 " placeholder="*******"/>
+                            </div>
+                        </div>
+                        <div class="flex flex-row items-center justify-end mt-5">
+                            <button type="submit" class="inline-flex felx-row gap-2 items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-4 h-4 text-white" fill="currentColor">
+                                <path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm0 96c0-17.7 14.3-32 32-32l192 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L96 224c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+                            Change Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+  
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+  <!-- <script type="module" src="/js/home.js"></script> -->
+  <script type="module" src="/js/profile.js"></script>
+</body>
+</html>

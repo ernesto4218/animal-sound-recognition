@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="/css/output.css" />
+  <title>Recognition</title>
+  <style>
+    /* Hide scrollbars globally across all elements */
+    * {
+        scrollbar-width: none;            /* Firefox */
+        -ms-overflow-style: none;         /* IE 10+ */
+    }
+
+    *::-webkit-scrollbar {
+        display: "none";                    /* Chrome, Safari, Opera */
+    }
+
+    .apexcharts-tooltip {
+        color: #000000 !important;
+        font-family: 'Montserrat', sans-serif !important;
+    }
+
+    .apexcharts-legend {
+      padding-bottom: 50px;
+    }
+
+
+  </style>
+</head>
+<body class="bg-gray-900 h-screen w-screen flex flex-row text-white">
+    <%- include('components/forms') %>
+
+    <div class="bg-white w-[100px] h-full">
+        <%- include('components/nav') %>
+    </div>
+    <div class="bg-white w-full h-full flex flex-col relative">
+        <%- include('components/header', { data: header }) %>
+        <%- include('components/toasts') %>
+        <%- include('components/modal') %>
+
+
+        <div class="relative rounded-tl-4xl bg-gray-100 flex flex-row gap-5 w-full h-full p-5">
+            <iframe 
+                id="tm"
+                src="https://teachablemachine.withgoogle.com/train/audio/1tNwu1FBh02t3R2mpiwKFhbpxGDKxeU4w" 
+                title="Machine Learning"
+                class="absolute top-0 left-0 w-full h-full border-none"
+                allow="camera; microphone">
+            </iframe>
+            
+            <div 
+                class="flex flex-row items-center gap-2 font-bold text-xl absolute -top-1 -left-1 text-black bg-white bg-opacity-80 px-[90px] py-5 rounded-xl z-10 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-5 h-5 text-black" fill="currentColor">
+                    <path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>
+                Learning Model
+            </div>
+        </div>
+    </div>
+   
+  
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+  <!-- <script type="module" src="/js/home.js"></script> -->
+  <!-- <script type="module" src="/js/profile.js"></script> -->
+</body>
+</html>

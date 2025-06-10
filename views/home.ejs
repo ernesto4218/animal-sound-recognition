@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/output.css" />
+  <script src="/js/tensorflow.min.js"></script>
+  <script src="/js/speech-command.min.js"></script>
+  <title>Audio Classifier</title>
+  <style>
+    /* Hide scrollbars globally across all elements */
+    * {
+        scrollbar-width: none;            /* Firefox */
+        -ms-overflow-style: none;         /* IE 10+ */
+    }
+
+    *::-webkit-scrollbar {
+        display: none;                    /* Chrome, Safari, Opera */
+    }
+
+    @keyframes pulse-border {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7);
+        }
+        50% {
+            box-shadow: 0 0 0 50px rgba(248, 113, 113, 0);
+        }
+    }
+
+    .pulse-ring {
+        animation: pulse-border 1.5s infinite;
+    }
+
+  </style>
+</head>
+<body class="bg-gray-300 h-screen w-screen flex flex-row text-black">
+    
+    <div class="bg-white w-[100px] h-full">
+        <%- include('components/nav') %>
+    </div>
+    <div class="bg-white w-full h-full flex flex-col">
+        <%- include('components/header', { data: header }) %>
+
+        <div class="rounded-tl-4xl bg-gray-200 flex flex-row gap-5 w-full h-full p-5">
+            <div class="w-[70%] h-full flex flex-col justify-start">
+                    <div class="relative w-full">                        
+                        <div class="flex flex-row gap-2">
+                            <button 
+                                id="microBt" 
+                                class=" text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 flex flex-row gap-2 items-center">
+                                
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4 text-white" fill="currentcolor">
+                                    <path d="M398.3 3.4c-15.8-7.9-35-1.5-42.9 14.3c-7.9 15.8-1.5 34.9 14.2 42.9l.4 .2c.4 .2 1.1 .6 2.1 1.2c2 1.2 5 3 8.7 5.6c7.5 5.2 17.6 13.2 27.7 24.2C428.5 113.4 448 146 448 192c0 17.7 14.3 32 32 32s32-14.3 32-32c0-66-28.5-113.4-56.5-143.7C441.6 33.2 427.7 22.2 417.3 15c-5.3-3.7-9.7-6.4-13-8.3c-1.6-1-3-1.7-4-2.2c-.5-.3-.9-.5-1.2-.7l-.4-.2-.2-.1c0 0 0 0-.1 0c0 0 0 0 0 0L384 32 398.3 3.4zM128.7 227.5c6.2-56 53.7-99.5 111.3-99.5c61.9 0 112 50.1 112 112c0 29.3-11.2 55.9-29.6 75.9c-17 18.4-34.4 45.1-34.4 78l0 6.1c0 26.5-21.5 48-48 48c-17.7 0-32 14.3-32 32s14.3 32 32 32c61.9 0 112-50.1 112-112l0-6.1c0-9.8 5.4-21.7 17.4-34.7C398.3 327.9 416 286 416 240c0-97.2-78.8-176-176-176C149.4 64 74.8 132.5 65.1 220.5c-1.9 17.6 10.7 33.4 28.3 35.3s33.4-10.7 35.3-28.3zM32 512a32 32 0 1 0 0-64 32 32 0 1 0 0 64zM192 352a32 32 0 1 0 -64 0 32 32 0 1 0 64 0zM41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3l64 64c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-64-64c-12.5-12.5-32.8-12.5-45.3 0zM208 240c0-17.7 14.3-32 32-32s32 14.3 32 32c0 13.3 10.7 24 24 24s24-10.7 24-24c0-44.2-35.8-80-80-80s-80 35.8-80 80c0 13.3 10.7 24 24 24s24-10.7 24-24z"/></svg>
+                                <span id="btntext">Start Listening</span>
+                            </button>
+                            
+                            <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                                <span id="micselectedTXT">Select Microphone</span>
+                                <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                                </svg>
+                            </button>
+
+                            <!-- Dropdown menu -->
+                            <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
+                                <ul id="microphoneList" class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                                    <!-- Microphone options will be inserted here -->
+                                </ul>
+                            </div>
+
+                        </div>
+                        <canvas id="visualizer" class="block mx-auto bg-gray-200 w-full h-[200px] rounded-lg p-5"></canvas>
+                    </div>
+
+                    <div class="flex flex-row gap-2">
+                        <div class="w-[50%] flex flex-col gap-2 bg-white rounded-xl p-3">
+                            <div class="text-sm font-bold text-black flex flex-row gap-2 items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="w-4 h-4 text-black" fill="currentColor">
+                                    <path d="M192 0C139 0 96 43 96 96l0 160c0 53 43 96 96 96s96-43 96-96l0-160c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40c0 89.1 66.2 162.7 152 174.4l0 33.6-48 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l72 0 72 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-48 0 0-33.6c85.8-11.7 152-85.3 152-174.4l0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40c0 70.7-57.3 128-128 128s-128-57.3-128-128l0-40z"/>
+                                </svg>
+                                Real Time <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">Live</span></div>
+                            <div id="resultContainer">
+                                <!-- <div class="text-[14px] font-medium text-black flex flex-col">Name</div>
+                                <div class="mb-3 w-full h-6 bg-gray-200 rounded-full dark:bg-gray-700">
+                                    <div class="h-6 bg-blue-500 rounded-full" style="width: 45%"></div>
+                                </div>
+                                <div class="text-[14px] font-medium text-black flex flex-col">Name</div>
+                                <div class="mb-3 w-full h-6 bg-gray-200 rounded-full dark:bg-gray-700">
+                                    <div class="h-6 bg-blue-500 rounded-full" style="width: 45%"></div>
+                                </div><div class="text-[14px] font-medium text-black flex flex-col">Name</div>
+                                <div class="mb-3 w-full h-6 bg-gray-200 rounded-full dark:bg-gray-700">
+                                    <div class="h-6 bg-blue-500 rounded-full" style="width: 45%"></div>
+                                </div> -->
+                            </div>
+                        </div>
+
+                        <div class="w-[50%] flex flex-col gap-2 bg-white rounded-xl p-3">
+                            <div class="text-sm font-bold text-black flex flex-row gap-2 items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="w-4 h-4 text-black" fill="currentColor">
+                                    <path d="M192 0C139 0 96 43 96 96l0 160c0 53 43 96 96 96s96-43 96-96l0-160c0-53-43-96-96-96zM64 216c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40c0 89.1 66.2 162.7 152 174.4l0 33.6-48 0c-13.3 0-24 10.7-24 24s10.7 24 24 24l72 0 72 0c13.3 0 24-10.7 24-24s-10.7-24-24-24l-48 0 0-33.6c85.8-11.7 152-85.3 152-174.4l0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40c0 70.7-57.3 128-128 128s-128-57.3-128-128l0-40z"/>
+                                </svg>
+                                Predictions <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">Live</span></div>
+                            <div id="otherResults" class="flex flex-col gap-3 w-full"></div>
+
+                        </div>
+                    </div>
+
+                    <div class="flex flex-row gap-3 mt-5">
+                        <div class="flex flex-col gap-2 w-[50%]">
+                            <div class="text-sm font-bold text-black">Threshold Settings</div>
+                            <div class="flex flex-col gap-2">
+                                <div class="flex flex-row gap-2">
+                                        <div class="text-sm font-normal text-black">Probability :</div>
+                                        <span class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-gray-300"><%= settings.find(setting => setting.name === 'probability')?.value%></span>
+                                </div>
+                                <div class="flex flex-row gap-2">
+                                        <div class="text-sm font-normal text-black">Overlap :</div>
+                                        <span class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-gray-300"><%= settings.find(setting => setting.name === 'overlap')?.value%></span>
+                                </div>
+                                <div class="flex flex-row gap-2">
+                                        <div class="text-sm font-normal text-black">Percentage :</div>
+                                        <span class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-gray-300"><%= settings.find(setting => setting.name === 'percent')?.value%>%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2 w-[50%]">
+                            <div class="text-sm font-bold text-black">Allowed Filters</div>
+                            <div id="AlowedCategoryContainer" class="flex flex-row gap-1 flex-wrap">
+                                <div class="flex flex-row flex-wrap">
+                                    <p class="block text-sm font-semibold text-gray-800"><%= settings.find(setting => setting.name === 'filter_allow')?.value %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-row gap-1">
+                        <div class="w-full">
+                            <div class="flex flex-col gap-2 mt-5 p-3">
+                                <div class="text-sm font-bold text-black border-t-1 border-gray-700 pt-3">Real Time Logs</div>
+                                <div id="realtimeLogsContainer" class="h-[150px] max-h-[150px] overflow-y-scroll flex flex-col gap-2 text-xs font-normal text-gray-600 my-1"></div>
+                            </div>
+                        </div>
+                        <div class="w-full">
+                            <div class="flex flex-col gap-2 mt-5 p-3">
+                                <div class="text-sm font-bold text-black border-t-1 border-gray-700 pt-3">Predictions Logs</div>
+                                <div id="predictionsLogsContainer" class="h-[150px] max-h-[150px] overflow-y-scroll flex flex-col gap-2 text-xs font-normal text-gray-600 my-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+            </div>
+
+            <div class="w-[30%] h-full flex flex-col justify-start gap-2">
+                <div class="bg-white h-full w-full flex flex-col rounded-xl p-3 gap-3">
+                    <div class="text-sm font-bold text-black flex flex-row gap-2 items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="text-black w-4 h-4" fill="currentColor">
+                            <path d="M533.6 32.5C598.5 85.2 640 165.8 640 256s-41.5 170.7-106.4 223.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C557.5 398.2 592 331.2 592 256s-34.5-142.2-88.7-186.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM473.1 107c43.2 35.2 70.9 88.9 70.9 149s-27.7 113.8-70.9 149c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C475.3 341.3 496 301.1 496 256s-20.7-85.3-53.2-111.8c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zm-60.5 74.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C393.1 284.4 400 271 400 256s-6.9-28.4-17.7-37.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5zM301.1 34.8C312.6 40 320 51.4 320 64l0 384c0 12.6-7.4 24-18.9 29.2s-25 3.1-34.4-5.3L131.8 352 64 352c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l67.8 0L266.7 40.1c9.4-8.4 22.9-10.4 34.4-5.3z"/>
+                        </svg>
+                        Latest Identified Sounds
+                    </div>
+                    <div id="IdentifiedCOntainer" class="flex flex-col max-h[500px] overflow-y-scroll">
+                        <!-- <div class="bg-gray-100 rounded-xl p-3 flex flex-row gap-2">
+                            <img class="w-15 h-15 rounded-full" src="https://placehold.co/400" alt="Rounded avatar">
+                            <div class="full">
+                                <div class="text-sm font-medium text-black">Name</div>
+                                <div class="text-sm font-medium text-black">Audio File</div>
+                                <div class="text-xs font-normal text-gray-500">Date</div>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+                <!-- <div class="bg-white h-full w-full flex flex-col rounded-xl p-3 gap-3">
+                    <div class="text-sm font-bold text-black flex flex-row gap-2 items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-4 h-4 text-black" fill="currentColor">
+                            <path d="M160 80c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 352c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-352zM0 272c0-26.5 21.5-48 48-48l32 0c26.5 0 48 21.5 48 48l0 160c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48L0 272zM368 96l32 0c26.5 0 48 21.5 48 48l0 288c0 26.5-21.5 48-48 48l-32 0c-26.5 0-48-21.5-48-48l0-288c0-26.5 21.5-48 48-48z"/>
+                        </svg>
+                        Analytics</div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+   
+    <div id="pass-data"
+        data-settings="<%= JSON.stringify(settings) || '' %>"
+        data-classphoto="<%= JSON.stringify(animal_photos) || '' %>"
+
+        >
+    </div>
+
+    <!-- notify  -->
+    <div id="alertContainer" class="hidden fixed inset-0 bg-black/80 z-50 flex-col items-center justify-center">
+        <img class="animalIMG w-40 h-40 rounded-full border-4 border-red-400 pulse-ring" src="https://placehold.co/400" alt="Rounded avatar">
+        <p class="animalnameTXT text-white font-bold text-lg mt-5">Animal Name</p>
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+  <!-- <script type="module" src="/js/home.js"></script> -->
+  <script type="module" src="/js/tm.js"></script>
+  <script type="module" src="/js/visualizer.js"></script>
+
+</body>
+</html>

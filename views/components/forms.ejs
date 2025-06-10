@@ -1,0 +1,69 @@
+<!-- sform  -->
+ <div id="addPhotoClassFormContainer" class="hidden fixed flex-col gap-3 bg-black/60 items-center justify-center w-full h-full z-50">
+    <!-- add product -->
+    <form id="AddPhotoClassFoorm" class="bg-white p-5 rounded-2xl w-md">
+        <div class="mb-5 flex flex-row justify-between">
+            <div class="text-gray-900 font-semibold text-xl">Add photo to class</div>
+            <svg id="close_addproductForm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="text-gray-900 w-5 h-5" fill="currentColor"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
+        </div>
+        <div class="mb-5 hidden">
+            <label for="id" class="block mb-2 text-sm font-medium text-gray-900 ">id</label>
+            <input type="number" id="id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:placeholder-gray-400 " placeholder="100" />
+        </div>
+
+        <div class="mb-5">
+            <label for="name" class="block text-sm font-medium text-gray-900 ">Name</label>
+            <p class="text-gray-500 text-sm font-normal">Must match with the class name.</p>
+            <input type="text" name="class_name" class="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:placeholder-gray-400 " placeholder="Class" required />
+        </div>
+        
+        <div class="mb-5">
+            <input type="file" id="productImage" accept="image/*" class="hidden" />
+            <button type="button" id="uploadImgBtn"
+                class="flex flex-row items-center gap-2 mb-5 w-fit text-gray-500 bg-gray-300 hover:bg-gray-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4" fill="currentColor">
+                <path
+                    d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z" />
+                </svg>
+                Select Image
+            </button>
+            <div id="imagePreviewContainer" class=""></div>
+        </div>
+
+
+        <button id="uploadClassPhotoSubmitFormBTN" type="submit" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm flex gap-2 row items-center justify-center w-full px-5 py-2.5 text-center ">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4 text-white" fill="currentColor">
+                <path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"/>
+            </svg>
+            <p>Upload Image</p></button> 
+
+    </form>
+</div>
+<script>
+    const addPhotoClassFormContainer = document.getElementById('addPhotoClassFormContainer');
+    const close_addproductForm = document.getElementById('close_addproductForm');
+    close_addproductForm.onclick = function() {
+        addPhotoClassFormContainer.classList.remove('flex');
+        addPhotoClassFormContainer.classList.add('hidden');
+    };
+
+    const uploadImgBtn = document.getElementById('uploadImgBtn');
+    uploadImgBtn.onclick = function() {
+        fileInput.click();
+    };
+
+    const fileInput = document.getElementById('productImage');
+    fileInput.addEventListener('change', () => {
+        const files = fileInput.files;
+        if (files.length > 5) {
+        showToast('error', 'You can upload a maximum of 5 images.');
+        fileInput.value = ''; // Clear selection
+        uploadImgBtn.innerHTML = `Upload Image`;
+        return;
+        }
+
+        const fileNames = Array.from(files).map(file => file.name).join(', ');
+        uploadImgBtn.innerHTML = `<span class="inline-block max-w-full whitespace-nowrap overflow-hidden text-ellipsis align-middle">${fileNames}</span>`;
+
+    });
+</script>

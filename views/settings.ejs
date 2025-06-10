@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/output.css" />
+  <title>Settings</title>
+  <style>
+    /* Hide scrollbars globally across all elements */
+    * {
+        scrollbar-width: none;            /* Firefox */
+        -ms-overflow-style: none;         /* IE 10+ */
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+    }
+
+  </style>
+</head>
+<body class="bg-gray-900 flex flex-row text-white h-[100vh]">
+    <%- include('components/forms') %>
+
+    <div class="bg-white w-[100px] h-full">
+        <%- include('components/nav') %>
+    </div>
+    <div class="bg-white w-full h-full flex flex-col">
+        <%- include('components/header', { data: header }) %>
+        <%- include('components/toasts') %>
+        <%- include('components/modal') %>
+
+
+        <div class="rounded-tl-4xl bg-gray-200 flex flex-row gap-5 w-full h-full p-4 overflow-y-scroll">
+          <div class="flex flex-col gap-5">
+            <form id="threshold_filter" class="bg-white flex flex-col gap-2 rounded-2xl w-full h-fit p-3">
+              <div class="flex flex-row gap-4">
+                <!-- Threshold -->
+                <div class="flex flex-col gap-2 p-3w-fit h-fit border-1 border-r-gray-400 pr-5">
+                    <div class="text-sm font-bold text-black flex flex-col gap-2">Threshold Settings</div>
+                    <div class="flex flex-col mt-3">
+                      <label for="probability" class="block mb-2 text-sm font-medium text-gray-900">Probability:</label>
+                      <input name="probability" value="<%= settings.find(setting => setting.name === 'probability')?.value %>" type="number" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-[300px]" placeholder="0"/>
+
+                      <label for="overlap-input" class="block mb-2 text-sm font-medium text-gray-900">Overlap:</label>
+                      <input name="overlap" value="<%= settings.find(setting => setting.name === 'overlap')?.value %>" type="number" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="0"/>
+
+                      <label for="percent" class="block mb-2 text-sm font-medium text-gray-900">Percentage:</label>
+                      <input name="percent" value="<%= settings.find(setting => setting.name === 'percent')?.value %>" type="number" aria-describedby="helper-text-explanation" class="mb-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="0"/>
+                    </div>
+                </div>
+
+                <!-- filter -->
+                <div class="flex flex-col w-fit h-fit">
+                    <div class="text-sm font-bold text-black flex flex-col gap-2">Filters</div>
+                    <div class="text-xs font-normal text-gray-500 flex flex-col gap-2">Separate filters by comma</div>
+                    <div class="w-[500px] flex flex-col mt-3">
+                      <div class="flex flex-row gap-2 w-full">
+                        <div class="flex flex-col w-full">
+                          <label for="filter_allow" class="block mb-2 text-sm font-medium text-gray-900">Allowed Filters</label>
+                            <textarea name="filter_allow" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Classes here..."><%= settings.find(setting => setting.name === 'filter_allow')?.value || '' %></textarea>
+                        </div>
+                        <div class="flex flex-col w-full">
+                          <label for="filter_deny" class="block mb-2 text-sm font-medium text-gray-900">Denied Filters</label>
+                            <textarea name="filter_deny" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Classes here..."><%= settings.find(setting => setting.name === 'filter_deny')?.value || '' %></textarea>
+                        </div>
+                      </div>
+                      
+                      <div class="bg-gray-100 flex flex-col gap-2 p-3 mt-5 rounded-2xl">
+                        <p class="block text-sm font-medium text-gray-900">All Filters</p>
+                        <div class="flex flex-row flex-wrap">
+                          <p class="block text-xs font-normal text-gray-500"><%= settings.find(setting => setting.name === 'all_filters')?.value %></p>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+
+              <div class="flex flex-row items-center justify-end mt-5">
+                <button type="submit" class="inline-flex flex-row gap-2 items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-4 h-4 text-white" fill="currentColor">
+                    <path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm0 96c0-17.7 14.3-32 32-32l192 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32L96 224c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+                  Save</button>
+              </div>
+            </form>
+
+            <div class="bg-white flex flex-col rounded-2xl w-full h-full p-3">
+              <div class="flex flex-row items-center justify-between">
+                <div class="flex flex-col gap-0 mb-5">
+                  <p class="text-sm font-bold text-black flex flex-col gap-2">Animals</p>
+                  <p class="text-black font-medium text-sm">Photo and Class</p>
+                </div>
+                  <button id="addphotoclassbtn" type="submit" class="inline-flex flex-row gap-2 items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4 text-white" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM232 344l0-64-64 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l64 0 0-64c0-13.3 10.7-24 24-24s24 10.7 24 24l0 64 64 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-64 0 0 64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg>
+                  Add</button> 
+              </div>
+
+              <div class="flex flex-col gap-2 h-[350px] overflow-y-scroll">
+                <% photos.forEach(photo => { %>
+                 <div class="flex flex-row bg-gray-100 rounded-2xl p-3">
+                  <div class="flex flex-row items-center w-full">
+                      <img class="w-20 h-20 rounded-full" src="/photoclass/<%= photo.image_name %>" alt="Rounded avatar">
+                      <div class="flex flex-row items-center justify-between w-full">
+                        <div class="flex flex-col ml-3 gap-1">
+                            <p class="text-gray-400 font-medium text-xs">#<%= photo.id %></p>
+                            <p class="text-black font-semibold text-sm"><%= photo.class_name %></p>
+                            <p class="text-black font-normal text-xs">File Name : <%= photo.original_name %></p>
+                            <p class="text-black font-normal text-xs">Photo ID : <%= photo.image_name %></p>
+                            <p class="text-black font-normal text-xs">Path : <%= photo.path %></p>
+                            <p class="text-gray-400 font-medium text-xs">Date : <%= photo.date_uploaded %></p>
+                        </div>
+                        <div class="flex flex-col items-center justify-end mt-2 w-fit gap-3">
+                                  <div class="flex items-center mb-4">
+                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+                                        class="mr-1 w-4 h-4 text-red-400 flex-shrink-0" fill="currentColor">
+                                      <path d="M224 0c-17.7 0-32 14.3-32 32l0 19.2C119 66 64 130.6 64 208l0 18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416l384 0c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8l0-18.8c0-77.4-55-142-128-156.8L256 32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3l-64 0-64 0c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/>
+                                    </svg>
+
+                                      <input <% if (photo.notify === 1) { %>
+                                       checked
+                                      <% } %> data-id="<%= photo.id %>" id="notify-danger-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-1 dark:bg-gray-700 dark:border-gray-600">
+                                  </div>
+                                  <!-- <label class="inline-flex items-center cursor-pointer select-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+                                        class="mr-1 w-4 h-4 text-red-400 flex-shrink-0" fill="currentColor">
+                                      <path d="M224 0c-17.7 0-32 14.3-32 32l0 19.2C119 66 64 130.6 64 208l0 18.8c0 47-17.3 92.4-48.5 127.6l-7.4 8.3c-8.4 9.4-10.4 22.9-5.3 34.4S19.4 416 32 416l384 0c12.6 0 24-7.4 29.2-18.9s3.1-25-5.3-34.4l-7.4-8.3C401.3 319.2 384 273.9 384 226.8l0-18.8c0-77.4-55-142-128-156.8L256 32c0-17.7-14.3-32-32-32zm45.3 493.3c12-12 18.7-28.3 18.7-45.3l-64 0-64 0c0 17 6.7 33.3 18.7 45.3s28.3 18.7 45.3 18.7s33.3-6.7 45.3-18.7z"/>
+                                    </svg>
+
+                                    <span class="text-sm font-medium text-red-400 mr-2">Danger</span>
+
+                                    <input type="checkbox" value="" class="sr-only peer" onclick="event.preventDefault(); event.stopPropagation(); this.checked = !this.checked;">
+                                    
+                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+                                  </label> -->
+
+
+                                  <button type="submit" class="delete-class-photo-btn inline-flex flex-row gap-2 items-center text-white bg-red-400 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center" data-id="<%= photo.id %>">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-4 h-4 text-white" fill="currentColor">
+                                      <path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                                    </svg>
+                                    Delete</button>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+                <% }) %>
+                
+              </div>
+            </div>
+          </div>
+          
+          <!-- Models -->
+           <div class="flex flex-col p-3 bg-white rounded-2xl w-full h-full">
+              <p class="text-sm font-bold text-black flex flex-col gap-2">Sound Recognition</p>
+              <div class="flex flex-col gap-2 mt-3 bg-gray-100 p-4 rounded-2xl">
+                <div class="flex flex-row gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-3 h-3 text-gray-600" fill="currentColor">
+                    <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>
+                  </svg>
+                  <p class="text-xs font-normal text-gray-600">To update the model, download the latest trained model and upload it inside the system.</p>
+                </div>
+                <div class="flex flex-row gap-2">
+                  <div class="flex flex-row items-center justify-end mt-2">
+                    <a href="/downloadmachinelearning/<%= settings.find(setting => setting.name === 'model')?.value%>.zip" download>
+                      <button type="button" class="inline-flex flex-row gap-2 items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4 text-white" fill="currentColor">
+                          <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+                        </svg>
+                        Download Current Model
+                      </button>
+                    </a>
+                  </div>
+
+                  <!-- <a href="https://teachablemachine.withgoogle.com/train/audio" target="_blank" rel="noopener noreferrer">
+                    <div class="flex flex-row items-center justify-end mt-2">
+                      <button type="submit" class="inline-flex flex-row gap-2 items-center text-white bg-blue-400 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4 text-white" fill="currentColor">
+                          <path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/>
+                        </svg>
+                        Teachable Machines</button>
+                    </div>
+                  </a> -->
+                  
+                </div>
+              </div>
+              
+              <div class="flex flex-col gap-2 mt-5">
+                <p class="text-sm font-medium text-black flex flex-col gap-2">Update Learning</p>
+                <div class="flex flex-row gap-2">
+                  <p class="text-sm font-normal text-black">Active Model : </p>
+                  <span id="activeModelTXT" class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm"><%= settings.find(setting => setting.name === 'model')?.value%></span>
+                </div>
+                <div id="drop-area"
+                    class="flex items-center justify-center flex-col gap-1 border-1 border-dashed border-gray-400 h-[200px] rounded-4xl hover:bg-gray-100 relative"
+                  >
+                    <!-- Hidden file input -->
+                    <input id="fileElem" type="file" accept=".zip" style="display:none" />
+
+                    <div class="bg-gray-200 flex flex-row items-center justify-center p-4 rounded-full w-fit">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-10 h-10 text-gray-600" fill="currentColor">
+                        <path d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128l-368 0zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39L296 392c0 13.3 10.7 24 24 24s24-10.7 24-24l0-134.1 39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"/>
+                      </svg>
+                    </div>
+                    
+                    <span class="flex flex-row text-sm font-medium text-black gap-2">
+                      <p>Drop your zip file here or</p>
+                      <p class="text-blue-500 font-semibold cursor-pointer" onclick="document.getElementById('fileElem').click()">Browse</p>
+                    </span>
+                    
+                    <p class="text-xs font-medium text-gray-500">Only upload files from Machine Learning model exports</p>
+                  </div>
+                </div>
+ß
+              <div class="flex flex-col gap-2 mt-3">
+                <p class="text-sm font-medium text-black flex flex-col gap-2">Uploaded Files</p>
+                <div class="flex flex-col bg-gray-100 rounded-2xl p-3 h-[300px] overflow-y-scroll">
+                  <% files.forEach(model => { %>
+                      <div class="flex flex-col w-full">
+                        <p class="text-gray-400 font-medium text-xs">#<%= model.id %></p>
+                        <p class="text-black font-semibold text-sm"><%= model.original_name %></p>
+                        <p class="text-gray-700 font-medium text-sm">Model Name : <%= model.filename %></p>
+                        <p class="text-gray-400 font-medium text-xs date-display" data-date="<%= model.upload_date %>">Loading...</p>
+                      </div>
+                      <div class="flex flex-row items-center justify-start mt-3 w-full gap-2 border-1 border-b-gray-400 pb-3 mb-5">
+                              <button 
+                                type="button" 
+                                class="use-model-btn flex flex-row gap-2 items-center focus:outline-none text-white bg-emerald-400 hover:bg-emerald-800 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5"
+                                data-id="<%= model.id %>"
+                              >
+
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4 text-white" fill="currentColor">
+                                  <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
+                                </svg>
+                              Use Model</button>
+
+
+                            <!-- <button type="submit" class="flex flex-row gap-2 items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4 text-white" fill="currentColor">
+                                <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+                              </svg>
+                            Download</button> -->
+
+                            <button type="submit" class="delete-model-btn flex flex-row gap-2 items-center text-white bg-red-400 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center" data-id="<%= model.id %>">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="w-4 h-4 text-white" fill="currentColor">
+                                <path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+                              </svg>
+                            Delete</button>
+                      </div>
+                  <% }) %>
+                </div>
+              </div>
+
+           </div>
+        </div>
+    </div>
+   
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+  <!-- <script type="module" src="/js/home.js"></script> -->
+  <script type="module" src="/js/settings.js"></script>
+</body>
+</html>

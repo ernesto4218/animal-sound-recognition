@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MediaPipe Audio Classification</title>
+  <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: Roboto, sans-serif;
+      margin: 2em;
+      color: #3d3d3d;
+      --mdc-theme-primary: #007f8b;
+      --mdc-theme-on-primary: #f1f3f4;
+    }
+    h1 {
+      color: #007f8b;
+    }
+    table {
+      table-layout: fixed;
+      width: 95%;
+      border-collapse: collapse;
+    }
+    td, th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    tr:hover { background-color: #ddd; }
+    th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #12b5cb;
+      color: white;
+    }
+    /* Other styles from your example here... */
+  </style>
+</head>
+<body>
+  <h1>Audio Classification using MediaPipe</h1>
+
+  <section id="demos" class="invisible">
+    <h3>This demo uses the MediaPipe Audio Classifier Task to list the top classes in the given audio sample.</h3>
+    <br />
+    <h2>Classify using an audio file</h2>
+    <div>
+      <div class="input" style="float: left;">
+        <audio id="audioClip1" src="/recognition/sounds/cat/Cat Meowing Loudly.mp3"></audio>
+        <button id="classifyBtn1" class="mdc-button mdc-button--raised">
+          <span class="mdc-button__label">AUDIO 1 - Dog</span>
+        </button>
+        <table id="audioResult1" class="removed"></table>
+      </div>
+      <div class="input" style="margin-left: 50%;">
+        <audio id="audioClip2" src="https://assets.codepen.io/9177687/train-1-99265.mp3"></audio>
+        <button id="classifyBtn2" class="mdc-button mdc-button--raised">
+          <span class="mdc-button__label">AUDIO 2 - TRAIN</span>
+        </button>
+        <table id="audioResult2" class="removed"></table>
+      </div>
+    </div>
+
+    <div style="top: 30px; position: relative; clear: both;">
+      <h2>Stream audio classifications</h2>
+      <div>Click <b>Start Classifying</b> to start streaming classifications of your own audio.</div>
+      <button class="mdc-button mdc-button--raised" id="microBt">
+        <span class="mdc-button__label">START CLASSIFYING</span>
+      </button>
+      <p id="microResult"></p>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+  <script type="module">
+    import audio from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-audio@0.10.0";
+
+    const { AudioClassifier, AudioClassifierResult, FilesetResolver } = audio;
+
+    const demosSection = document.getElementById("demos");
+
+    let audioClassifier;
+    let audioCtx;
+    const wildAnimalLabels = [
+      "Roar",
+      "Growling",
+      "Howling",
+      "Bark",
+      "Bird vocalization, bird call, bird song",
+      "Chirp, tweet",
+      "Squawk",
+      "Insect",
+      "Frog",
+      "Cricket",
+      "Wild animals",
+      "Canidae, dogs, wolves",
+      "Felidae, cats, lions, tigers"
+    ];
+
+    const createAudioClassifier = async () => {
+      const audio = await FilesetResolver.forAudioTasks(
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-audio@0.10.0/wasm"
+      );
+
+      audioClassifier = await AudioClassifier.createFromOptions(audio, {
+        baseOptions: {
+          modelAssetPath:
+            "recognition/yamnet.tflite",
+        },
+      });
+
+      demosSection.classList.remove("invisible");
+    };
+    createAudioClassifier();
+
+    document.getElementById("classifyBtn1").addEventListener("click", async () => {
+      await runAudioClassification("audioClip1", "audioResult1");
+    });
+    document.getElementById("classifyBtn2").addEventListener("click", async () => {
+      await runAudioClassification("audioClip2", "audioResult2");
+    });
+
+    async function runAudioClassification(demo, resultText) {
+      const output = document.getElementById(resultText);
+      const audioClip = document.getElementById(demo);
+
+      if (!audioClassifier) {
+        alert("Audio Classifier still loading. Please try again");
+        return;
+      }
+
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+      }
+
+      if (!audioClip.paused) {
+        audioClip.pause();
+        return;
+      }
+
+      audioClip.play();
+
+      const url = audioClip.src;
+      const response = await fetch(url);
+      const sample = await response.arrayBuffer();
+      const audioBuffer = await audioCtx.decodeAudioData(sample);
+
+      const results = audioClassifier.classify(
+        audioBuffer.getChannelData(0),
+        audioBuffer.sampleRate
+      );
+
+      displayClassificationResults(results, output);
+    }
+
+    function displayClassificationResults(results, output) {
+      while (output.firstChild) {
+        output.removeChild(output.firstChild);
+      }
+
+      const tr = document.createElement("tr");
+      const timeTd = document.createElement("th");
+      timeTd.textContent = "Timestamp in MS";
+      const categoryTd = document.createElement("th");
+      categoryTd.textContent = "Category";
+      const scoreTd = document.createElement("th");
+      scoreTd.textContent = "Confidence";
+
+      tr.appendChild(timeTd);
+      tr.appendChild(categoryTd);
+      tr.appendChild(scoreTd);
+      output.appendChild(tr);
+
+      for (const result of results) {
+        const categories = result.classifications[0].categories;
+        const timestamp = result.timestampMs;
+
+        const filteredCategories = categories.filter(c =>
+          wildAnimalLabels.includes(c.categoryName)
+        );
+
+        if (filteredCategories.length === 0) {
+          output.innerHTML = "<tr><td colspan='3'>No wild animal sounds detected.</td></tr>";
+          return;
+        }
+
+        const topCategory = filteredCategories[0].categoryName;
+        const topScore = filteredCategories[0].score.toFixed(3);
+
+        const tr = document.createElement("tr");
+
+        const timeTd = document.createElement("td");
+        timeTd.style.textAlign = "right";
+        timeTd.textContent = timestamp;
+
+        const categoryTd = document.createElement("td");
+        categoryTd.textContent = topCategory;
+
+        const scoreTd = document.createElement("td");
+        scoreTd.textContent = topScore;
+
+        tr.appendChild(timeTd);
+        tr.appendChild(categoryTd);
+        tr.appendChild(scoreTd);
+        output.appendChild(tr);
+      }
+
+      output.className = "";
+    }
+
+    // Streaming from microphone
+    const streamingBt = document.getElementById("microBt");
+    streamingBt.addEventListener("click", async () => {
+      await runStreamingAudioClassification();
+    });
+
+    async function runStreamingAudioClassification() {
+      const output = document.getElementById("microResult");
+      const constraints = { audio: true };
+      let stream;
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (err) {
+        alert("getUserMedia not supported on your browser: " + err);
+        return;
+      }
+
+      if (!audioCtx) {
+        audioCtx = new AudioContext({ sampleRate: 16000 });
+      } else if (audioCtx.state === "running") {
+        await audioCtx.suspend();
+        streamingBt.firstElementChild.innerHTML = "START CLASSIFYING";
+        return;
+      }
+
+      await audioCtx.resume();
+      streamingBt.firstElementChild.innerHTML = "STOP CLASSIFYING";
+
+      const source = audioCtx.createMediaStreamSource(stream);
+      const scriptNode = audioCtx.createScriptProcessor(16384, 1, 1);
+
+      scriptNode.onaudioprocess = function (audioProcessingEvent) {
+        const inputBuffer = audioProcessingEvent.inputBuffer;
+        let inputData = inputBuffer.getChannelData(0);
+
+        const result = audioClassifier.classify(inputData);
+        const categories = result[0].classifications[0].categories;
+        const wildOnly = categories.filter(c =>
+          wildAnimalLabels.includes(c.categoryName)
+        );
+
+        if (wildOnly.length === 0) {
+          output.innerText = "No wild animal sounds detected.";
+          return;
+        }
+
+        output.innerText = wildOnly
+          .slice(0, 3)
+          .map(c => `${c.categoryName} (${c.score.toFixed(3)})`)
+          .join("\n");
+
+      };
+
+      source.connect(scriptNode);
+      scriptNode.connect(audioCtx.destination);
+    }
+  </script>
+</body>
+</html>
